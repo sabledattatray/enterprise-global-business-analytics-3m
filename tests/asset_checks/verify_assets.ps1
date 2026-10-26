@@ -10,7 +10,7 @@
 #>
 
 $ErrorActionPreference = "Stop"
-$root = "d:\Datasets\3M Project Power BI"
+$root = if ($env:GITHUB_WORKSPACE) { $env:GITHUB_WORKSPACE } else { (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path }
 
 Write-Host "=== VERIFYING REPOSITORY VISUAL ASSETS ===" -ForegroundColor Yellow
 

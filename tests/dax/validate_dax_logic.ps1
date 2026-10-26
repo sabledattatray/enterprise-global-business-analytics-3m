@@ -10,7 +10,8 @@
 #>
 
 $ErrorActionPreference = "Stop"
-$measuresDir = "d:\Datasets\3M Project Power BI\powerbi\measures"
+$repoRoot = if ($env:GITHUB_WORKSPACE) { $env:GITHUB_WORKSPACE } else { (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path }
+$measuresDir = Join-Path $repoRoot "powerbi\measures"
 $daxFiles = Get-ChildItem -Path $measuresDir -Filter "*.dax"
 
 Write-Host "=== AUDITING POWER BI DAX MEASURES ===" -ForegroundColor Yellow
