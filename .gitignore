@@ -1,0 +1,55 @@
+# ==============================================================================
+# Enterprise Global Business Analytics — 3M Synthetic Transactions
+# Git Ignore Configuration
+# ==============================================================================
+
+# Database & Engine Artifacts (Do not commit massive SQL Server files)
+*.mdf
+*.ldf
+*.ndf
+*.bak
+*.trn
+*.dmp
+
+# Raw Datasets & Massive CSVs (>100MB)
+# Note: Full 3M dataset is available via Google Drive download link in documentation
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.h5
+*.xlsx
+*.xls
+!data/samples/*.csv
+
+# Power BI Desktop Models (>100MB)
+# Note: PBIX files are distributed via GitHub Releases or external repository storage
+*.pbix
+*.pbit
+
+# Operating System & IDE Specific
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Nn]on[Dd]esktop.ini
+Desktop.ini
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# PowerShell & Script Logs
+*.log
+scratch/
+__pycache__/
+*.py[cod]
+
+# Environment & Secrets
+.env
+.env.*
+*.credentials
+*.key
+*.pem
+secrets/

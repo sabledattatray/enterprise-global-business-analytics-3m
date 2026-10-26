@@ -1,0 +1,58 @@
+// ==============================================================================
+// Measure Group: Base Operational Measures
+// Table:         _Measures
+// Project:       Enterprise Global Business Analytics — 3M Synthetic Transactions
+// Author:        Datta Sable (https://dattasable.com)
+// Description:   Core volume and operational measures valid across all filter contexts
+// ==============================================================================
+
+// 1. Total Orders
+// Distinct count of order_id across the reporting fact view (Baseline: 3,000,000 unfiltered)
+Total Orders = 
+DISTINCTCOUNT(vw_FactSales[order_id])
+
+// Format: #,##0
+
+
+// 2. Total Units Sold
+// Total physical units moved across all transactions (Baseline: ~16,499,000 units)
+Total Units Sold = 
+SUM(vw_FactSales[quantity])
+
+// Format: #,##0
+
+
+// 3. Average Units Per Order
+// Ratio of total units sold to distinct orders (Baseline: ~5.50 units/order)
+Average Units Per Order = 
+DIVIDE(
+    [Total Units Sold], 
+    [Total Orders], 
+    0
+)
+
+// Format: #,##0.00
+
+
+// 4. Total Transactions
+// Count of unique transaction events (Baseline: 3,000,000)
+Total Transactions = 
+DISTINCTCOUNT(vw_FactSales[transaction_id])
+
+// Format: #,##0
+
+
+// 5. Active Countries
+// Number of distinct countries currently in filter context (Baseline: 50)
+Active Countries = 
+DISTINCTCOUNT(DimGeography[country])
+
+// Format: #,##0
+
+
+// 6. Active Products Sold
+// Number of distinct products sold in filter context (Baseline: 15)
+Active Products Sold = 
+DISTINCTCOUNT(DimProduct[product_name])
+
+// Format: #,##0

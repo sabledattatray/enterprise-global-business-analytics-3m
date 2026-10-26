@@ -1,0 +1,20 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted to native line endings on checkout
+*.md text
+*.sql text
+*.dax text
+*.json text
+*.yml text
+*.yaml text
+*.ps1 text
+*.py text
+*.txt text
+
+# Declare binary files to avoid git corrupting them on checkout
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.svg text
+*.ico binary

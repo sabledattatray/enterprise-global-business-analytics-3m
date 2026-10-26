@@ -1,0 +1,89 @@
+// ==============================================================================
+// Measure Group: Finance Measures (P0 Multi-Currency Guardrails)
+// Table:         _Measures
+// Project:       Enterprise Global Business Analytics — 3M Synthetic Transactions
+// Author:        Datta Sable (https://dattasable.com)
+// Description:   Mandatory currency-gated monetary measures enforcing HASONEVALUE
+//                to prevent invalid cross-currency arithmetic aggregation.
+// ==============================================================================
+
+// 1. Selected Currency Code
+// Returns active currency code when exactly one is selected, or a guidance message
+Selected Currency Code = 
+IF(
+    HASONEVALUE(DimGeography[currency]),
+    SELECTEDVALUE(DimGeography[currency]),
+    "Multi-Currency (Select 1 Currency)"
+)
+
+
+// 2. Currency Context Gate Flag
+// Returns TRUE only when a single currency is active
+Is Single Currency Context = 
+HASONEVALUE(DimGeography[currency])
+
+
+// 3. Revenue (Single Currency Only)
+// Reconciles only when filtered by a single currency context; returns BLANK() globally
+Revenue (Single Currency Only) = 
+IF(
+    [Is Single Currency Context],
+    SUM(vw_FactSales[revenue]),
+    BLANK()
+)
+
+// Format: #,##0.00
+
+
+// 4. Cost (Single Currency Only)
+Cost (Single Currency Only) = 
+IF(
+    [Is Single Currency Context],
+    SUM(vw_FactSales[cost]),
+    BLANK()
+)
+
+// Format: #,##0.00
+
+
+// 5. Profit (Single Currency Only)
+Profit (Single Currency Only) = 
+IF(
+    [Is Single Currency Context],
+    SUM(vw_FactSales[profit]),
+    BLANK()
+)
+
+// Format: #,##0.00
+
+
+// 6. Profit Margin (Single Currency Only)
+Profit Margin (Single Currency Only) = 
+DIVIDE(
+    [Profit (Single Currency Only)],
+    [Revenue (Single Currency Only)],
+    BLANK()
+)
+
+// Format: 0.00%
+
+
+// 7. Average Order Value (Single Currency Only)
+Average Order Value (Single Currency Only) = 
+DIVIDE(
+    [Revenue (Single Currency Only)],
+    [Total Orders],
+    BLANK()
+)
+
+// Format: #,##0.00
+
+
+// 8. Currency Guardrail Notice
+// Explanatory dynamic string for visual headers and tooltips
+Currency Guardrail Notice = 
+IF(
+    [Is Single Currency Context],
+    CONCATENATE("Amounts displayed in: ", SELECTEDVALUE(DimGeography[currency])),
+    "⚠ Multi-currency context active (42 currencies). Financial totals hidden until a single currency or country is selected."
+)

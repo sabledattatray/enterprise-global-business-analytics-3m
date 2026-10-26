@@ -1,0 +1,85 @@
+// ==============================================================================
+// Measure Group: Time Intelligence & Period Measures
+// Table:         _Measures
+// Project:       Enterprise Global Business Analytics — 3M Synthetic Transactions
+// Author:        Datta Sable (https://dattasable.com)
+// Description:   Time intelligence, MTD, YTD and period-over-period comparisons
+//                using verified DimDate[FullDate] relationship.
+// ==============================================================================
+
+// 1. Orders YTD
+// Cumulative orders year-to-date based on DimDate calendar
+Orders YTD = 
+TOTALYTD(
+    [Total Orders],
+    DimDate[FullDate]
+)
+
+// Format: #,##0
+
+
+// 2. Orders MTD
+// Cumulative orders month-to-date
+Orders MTD = 
+TOTALMTD(
+    [Total Orders],
+    DimDate[FullDate]
+)
+
+// Format: #,##0
+
+
+// 3. Orders Previous Month
+Orders Previous Month = 
+CALCULATE(
+    [Total Orders],
+    DATEADD(DimDate[FullDate], -1, MONTH)
+)
+
+// Format: #,##0
+
+
+// 4. Orders MoM Growth Rate
+Orders MoM % Change = 
+VAR CurrentVal = [Total Orders]
+VAR PrevVal = [Orders Previous Month]
+RETURN
+IF(
+    ISBLANK(PrevVal) || PrevVal = 0,
+    BLANK(),
+    DIVIDE(CurrentVal - PrevVal, PrevVal)
+)
+
+// Format: +0.00%;-0.00%;0.00%
+
+
+// 5. Orders Previous Year (Same Period Last Year)
+Orders SPLY = 
+CALCULATE(
+    [Total Orders],
+    SAMEPERIODLASTYEAR(DimDate[FullDate])
+)
+
+// Format: #,##0
+
+
+// 6. Orders YoY Growth Rate
+Orders YoY % Change = 
+VAR CurrentVal = [Total Orders]
+VAR PrevVal = [Orders SPLY]
+RETURN
+IF(
+    ISBLANK(PrevVal) || PrevVal = 0,
+    BLANK(),
+    DIVIDE(CurrentVal - PrevVal, PrevVal)
+)
+
+// Format: +0.00%;-0.00%;0.00%
+
+
+// 7. Active Date Range Label
+Active Date Range = 
+CONCATENATE(
+    FORMAT(MIN(DimDate[FullDate]), "dd MMM yyyy"),
+    CONCATENATE(" – ", FORMAT(MAX(DimDate[FullDate]), "dd MMM yyyy"))
+)

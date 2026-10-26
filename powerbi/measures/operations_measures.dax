@@ -1,0 +1,99 @@
+// ==============================================================================
+// Measure Group: Operations & Fulfillment Measures
+// Table:         _Measures
+// Project:       Enterprise Global Business Analytics — 3M Synthetic Transactions
+// Author:        Datta Sable (https://dattasable.com)
+// Description:   Fulfillment lifecycle, order status distributions and operational rates
+// ==============================================================================
+
+// 1. Delivered Orders
+// Count of orders with fulfilled delivery status (Baseline: 1,950,380)
+Delivered Orders = 
+CALCULATE(
+    [Total Orders],
+    vw_FactSales[order_status] = "Delivered"
+)
+
+// Format: #,##0
+
+
+// 2. Cancelled Orders
+// Count of orders cancelled prior to or during fulfillment (Baseline: 150,324)
+Cancelled Orders = 
+CALCULATE(
+    [Total Orders],
+    vw_FactSales[order_status] = "Cancelled"
+)
+
+// Format: #,##0
+
+
+// 3. Shipped Orders
+// Count of orders currently in-transit with carrier (Baseline: 449,974)
+Shipped Orders = 
+CALCULATE(
+    [Total Orders],
+    vw_FactSales[order_status] = "Shipped"
+)
+
+// Format: #,##0
+
+
+// 4. Processing Orders
+// Count of orders being prepared in warehouse (Baseline: 449,322)
+Processing Orders = 
+CALCULATE(
+    [Total Orders],
+    vw_FactSales[order_status] = "Processing"
+)
+
+// Format: #,##0
+
+
+// 5. Delivery Completion Rate
+// Percentage of total orders successfully delivered (Baseline: ~65.01%)
+Delivery Completion Rate = 
+DIVIDE(
+    [Delivered Orders], 
+    [Total Orders], 
+    0
+)
+
+// Format: 0.00%
+
+
+// 6. Cancellation Rate
+// Percentage of total orders cancelled (Baseline: ~5.01%)
+Cancellation Rate = 
+DIVIDE(
+    [Cancelled Orders], 
+    [Total Orders], 
+    0
+)
+
+// Format: 0.00%
+
+
+// 7. In-Flight Fulfillment Rate
+// Percentage of orders currently active in supply chain pipeline (Shipped + Processing)
+In-Flight Fulfillment Rate = 
+DIVIDE(
+    [Shipped Orders] + [Processing Orders],
+    [Total Orders],
+    0
+)
+
+// Format: 0.00%
+
+
+// 8. Average Delivery Lead Time (Days)
+// Average elapsed days from order_date to actual_delivery_date for delivered orders
+Average Delivery Lead Time (Days) = 
+CALCULATE(
+    AVERAGEX(
+        FILTER(vw_FactSales, vw_FactSales[order_status] = "Delivered" && NOT(ISBLANK(vw_FactSales[actual_delivery_date]))),
+        DATEDIFF(vw_FactSales[order_date], vw_FactSales[actual_delivery_date], DAY)
+    )
+)
+
+// Format: #,##0.0 days
