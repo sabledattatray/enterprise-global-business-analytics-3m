@@ -1,7 +1,8 @@
-# Page 08 — Return Analysis & Order Exceptions
+# Page 08 — Order Exceptions & Cancellations
 
 **Title:** Global Business Analytics — Order Exceptions & Cancellations  
-**Route / Navigation ID:** `page-08-return-analysis`  
+**Former Title:** Return Analysis (Renamed per PRD v1.1 to reflect cancellations and status failures without fabricated return ledgers)  
+**Route / Navigation ID:** `page-08-order-exceptions`  
 **Canvas Dimensions:** 1920 × 1080 px (16:9 widescreen)  
 **Layout Grid:** 18% Left Persistent Sidebar, 82% Main Dashboard Canvas  
 **Visual Theme:** `powerbi/theme/enterprise-light-theme.json`  

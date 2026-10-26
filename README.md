@@ -3,6 +3,7 @@
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-2022%20Developer-CC292B?logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
 [![SSMS](https://img.shields.io/badge/SSMS-v22.0-blue?logo=microsoft)](https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms)
 [![Power BI](https://img.shields.io/badge/Power%20BI-Desktop%20Oct%202026-F2C811?logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/desktop/)
+[![CI Validation](https://github.com/sabledattatray/enterprise-global-business-analytics-3m/actions/workflows/validate.yml/badge.svg)](https://github.com/sabledattatray/enterprise-global-business-analytics-3m/actions)
 [![Scale](https://img.shields.io/badge/Scale-3%2C000%2C000%20Rows-107C41?logo=apachespark&logoColor=white)](https://dattasable.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Audit](https://img.shields.io/badge/Audit%20Standard-PRD%20v1.1%20Verified-brightgreen)](docs/TECHNICAL_AUDIT_REPORT.md)
@@ -26,15 +27,34 @@ Unlike typical showcase projects that overlook synthetic data generator flaws, t
 
 ---
 
-## 2. Dashboard Gallery & Visual Design System
+## 2. Implementation & Delivery Status Matrix
 
-The reporting layer features an exclusive corporate light design system utilizing an 18% persistent deep-navy navigation sidebar (`#061B3A` to `#0A2854`) anchored by a glowing 3D digital Earth network globe, paired with a spacious near-white canvas (`#F7FAFE`) with 1px hairline borders (`#DFE7F2`).
+To provide complete transparency for technical reviewers and hiring managers, this project separates the verified data modeling and engineering foundation from the report visual authoring phase:
 
-### Executive Overview (Page 01)
+| Architecture Layer | Component / Deliverable | Scope / Detail | Verification & Delivery Status | Evidence & Test Location |
+|---|---|---|:---:|---|
+| **SQL Data Pipeline** | 13 T-SQL Scripts (`sql/00` to `sql/12`) | Ingestion, typing, 81-day shift, surrogate keys, 3 dimensions, views, FKs | **100% PRODUCTION VERIFIED** | 12/12 automated SQL tests pass on 3M rows (`tests/sql/run_all_sql_tests.ps1`) |
+| **Tabular Semantic Model** | VertiPaq Data Model (`.pbix`) | Kimball star schema, 4 tables, 3 single-direction `1:*` active relationships | **100% MODEL VERIFIED** | 3,000,000 rows imported; 214 MB in-memory model (`docs/POWERBI_MODEL_VALIDATION.md`) |
+| **DAX Measure Catalog** | 4 DAX Libraries (`powerbi/measures/`) | Base, Operations, Date, and P0 Currency-Gated Financial measures | **100% PRODUCTION VERIFIED** | Static syntax and currency-guardrail CI audit passes (`tests/dax/validate_dax_logic.ps1`) |
+| **Visual Design Tokens** | Theme JSON, 260 Icons, Canvas | Corporate navy tokens (`#061B3A`, `#1769E0`), 65 icon concepts, 1536×1024 background | **100% ASSETS VERIFIED** | Asset integrity and JSON schema validation passes (`tests/asset_checks/verify_assets.ps1`) |
+| **Page Specifications & Design Mockups** | 9 Markdown Specs & 11 UI Layouts | Layout grids, card bindings, slicer matrices, and target UI reference mockups | **100% SPEC COMPLETED** | Published in [`powerbi/page-specs/`](powerbi/page-specs/) & [`assets/screenshots/`](assets/screenshots/) |
+| **Native Multi-Page Desktop Visuals** | Power BI Desktop Report Canvas | Page 01 Executive layout created; Pages 02–09 native drag-and-drop authoring in progress | **AUTHORING / SPEC PHASE** | Page 01 operational; Pages 02–09 documented with complete field-level binding specs |
+
+---
+
+## 3. Dashboard UI Design Mockups & Layout Targets
+
+The visual design system reflects a modern corporate light theme: an 18% persistent deep-navy sidebar (`#061B3A` to `#0A2854`) anchored by a glowing 3D digital Earth network globe, paired with a spacious near-white canvas (`#F7FAFE`) with 1px hairline card borders (`#DFE7F2`).
+
+> [!NOTE]
+> **Visual Artifact Disclosure:**  
+> The dashboard images below represent the **high-resolution UI design target mockups and layout specifications** created to guide report visual authoring in Power BI Desktop. Page 01 (Executive Overview) has been laid out in the desktop model (`Main Work.pbix`); Pages 02 through 09 are documented with complete field-level binding specifications in [`powerbi/page-specs/`](powerbi/page-specs/).
+
+### Executive Overview (Page 01 Target Layout)
 ![Executive Business Analytics Dashboard](assets/screenshots/Executive%20Business%20Analytics%20Dashboard.png)
 
 <details>
-<summary><b>📸 Click to expand the 9-Page Dashboard Showcase Gallery</b></summary>
+<summary><b>📸 Click to expand the 9-Page Dashboard Showcase Gallery (UI Design Mockups)</b></summary>
 <br/>
 
 | Page 02: Sales Performance | Page 03: Product Analysis |
@@ -57,7 +77,7 @@ The reporting layer features an exclusive corporate light design system utilizin
 
 ---
 
-## 3. Verified Core Facts & Baseline Metrics
+## 4. Verified Core Facts & Baseline Metrics
 
 All metrics below were audited and verified directly against the live SQL Server 2022 database `[3 _M]` and Power BI tabular model:
 
@@ -79,7 +99,7 @@ All metrics below were audited and verified directly against the live SQL Server
 
 ---
 
-## 4. End-to-End Pipeline Architecture
+## 5. End-to-End Pipeline Architecture
 
 ```mermaid
 flowchart LR
@@ -99,9 +119,9 @@ flowchart LR
 
 ---
 
-## 5. Critical Data Quality Guardrails (P0)
+## 6. Critical Data Quality Guardrails (P0)
 
-### 5.1 Multi-Currency Governance Guardrail
+### 6.1 Multi-Currency Governance Guardrail
 The dataset includes **42 distinct currencies**. Monetary fields represent local transaction currencies. A raw arithmetic sum across the dataset yields `18,720,460,798.92` — **this is an arithmetic illusion and has no economic meaning**.
 
 **Remediation:** All monetary DAX measures enforce `HASONEVALUE(DimGeography[currency])`:
@@ -115,30 +135,35 @@ IF(
 ```
 When multiple currencies are in context, monetary visual cards return `BLANK()` with an explicit instructional prompt directing the user to filter by a single currency or country.
 
-### 5.2 Customer Identity Defect Disclosure
+### 6.2 Customer Identity Defect Disclosure
 In the synthetic source data, **801,192 customer IDs map to multiple names**, and **796,571 map to multiple countries** (e.g. `CUST-0659044` appears across 13 countries and 14 distinct person names).
 
 **Remediation:** Unique-customer counts, customer retention rates, repeat buyer percentages, and Customer Lifetime Value (CLV) are **deliberately excluded**. Page 04 is titled **"Transaction & Channel Insights"**, evaluating **transaction-level behavioral patterns** (channel adoption, basket size distributions, and payment methods) with prominent disclosure callouts.
 
-### 5.3 Product Surrogate Key Repair
+### 6.3 Product Surrogate Key Repair
 Original source `product_id` values (1–15) mapped arbitrarily across all 15 product names. The stable combination `(product_name, product_category, brand)` was used to build `dbo.DimProduct` with surrogate integer `ProductKey`, completely eliminating dimension ambiguity.
 
 ---
 
-## 6. Measured Performance Benchmarks
+## 7. Measured Performance Benchmarks
 
-Performance was empirically measured on Microsoft SQL Server 2022 on local developer hardware across the full 3,000,000-row dataset:
+Performance was empirically measured on Microsoft SQL Server 2022 on host machine `DATTA` (Windows 11 Enterprise, NVMe SSD, 16+ GB RAM) across the full 3,000,000-row dataset using `System.Diagnostics.Stopwatch` (.NET) and `SET STATISTICS TIME, IO ON`. For hardware specs, cache procedures, and measurement methodology, see [docs/PERFORMANCE_BENCHMARK.md](docs/PERFORMANCE_BENCHMARK.md).
 
-| Benchmark Workload | Query Shape | Rows Processed | Duration | Throughput |
-|---|---|---:|---:|---:|
-| **Monthly Aggregation by Currency** | Full fact view scan grouped by Year, Month, Currency (4 aggregations) | 3,000,000 | **414 ms** | **7.2M rows/sec** |
-| **Star Schema 3-Way Join Slicing** | Fact view joined to DimProduct and DimGeography | 3,000,000 | **237 ms** | **12.6M rows/sec** |
-| **Headline Card Aggregation** | Single-pass Distinct Orders, Total Units, Avg Units | 3,000,000 | **315 ms** | **9.5M rows/sec** |
-| **Power BI Model Compression** | VertiPaq XPress9 columnar compression | 1.30 GB CSV | **214 MB in PBIX** | **6.1 : 1 Compression** |
+| Benchmark Workload | Query Shape | Rows Processed | Warm Duration | Cold Buffer | Peak Throughput |
+|---|---|---:|---:|---:|---:|
+| **Monthly Aggregation by Currency** | Full fact view scan grouped by Year, Month, Currency (4 aggregations) | 3,000,000 | **414 ms** | **1,138 ms** | **7.2M rows/sec** |
+| **Star Schema 3-Way Join Slicing** | Fact view joined to DimProduct and DimGeography | 3,000,000 | **237 ms** | **2,586 ms** | **12.6M rows/sec** |
+| **Headline Card Aggregation** | Single-pass Distinct Orders, Total Units, Avg Units | 3,000,000 | **315 ms** | **925 ms** | **9.5M rows/sec** |
+| **Power BI Model Compression** | VertiPaq XPress9 columnar compression | 1.30 GB CSV | **214 MB in PBIX** | — | **6.1 : 1 Compression** |
+
+### Reproduce Benchmarks Locally:
+```powershell
+powershell -ExecutionPolicy Bypass -File tests/sql/run_benchmarks.ps1
+```
 
 ---
 
-## 7. Power BI Semantic Model & Relationships
+## 8. Power BI Semantic Model & Relationships
 
 The Power BI model imports four dedicated SQL objects in a pure Kimball Star Schema:
 
@@ -188,23 +213,23 @@ classDiagram
 
 ---
 
-## 8. Nine-Page Feature Matrix & Technical Implementation Status
+## 9. Nine-Page Feature Matrix & Technical Implementation Status
 
-| Page | Title / Domain | Primary Focus | Completion Status | Detailed Specification |
-|:---:|---|---|:---:|---|
-| **01** | **Executive Overview** | Headline operational KPIs, freshness label, currency warning | `VERIFIED` | [Page 01 Spec](powerbi/page-specs/01_executive_overview.md) |
-| **02** | **Sales Performance** | Monthly order pacing, MoM/YoY growth (distinguished from revenue) | `VERIFIED` | [Page 02 Spec](powerbi/page-specs/02_sales_performance.md) |
-| **03** | **Product Analysis** | 15 validated products, category share %, units per order | `VERIFIED` | [Page 03 Spec](powerbi/page-specs/03_product_analysis.md) |
-| **04** | **Transaction & Channel Insights** | Channel & payment behaviors (identity collision disclosed) | `VERIFIED` | [Page 04 Spec](powerbi/page-specs/04_customer_insights.md) |
-| **05** | **Region Analysis** | 50 countries, 42 currencies, continent map + table fallback | `VERIFIED` | [Page 05 Spec](powerbi/page-specs/05_region_analysis.md) |
-| **06** | **Order Details** | Transaction drill-through grid across all 19 fact columns with search | `VERIFIED` | [Page 06 Spec](powerbi/page-specs/06_order_details.md) |
-| **07** | **Profitability Analysis** | Currency-gated revenue, cost, profit, and margin waterfall | `VERIFIED` | [Page 07 Spec](powerbi/page-specs/07_profitability_analysis.md) |
-| **08** | **Order Exceptions** | Cancellations (150K) and status failures (returns excluded) | `VERIFIED` | [Page 08 Spec](powerbi/page-specs/08_return_analysis.md) |
-| **09** | **Trend Analysis & Forecast Roadmap** | 5-year moving average trend decomposition + ML roadmap | `VERIFIED` | [Page 09 Spec](powerbi/page-specs/09_forecast_analysis.md) |
+| Page | Title / Domain | Primary Focus | Design & Binding Spec | Operational Desktop Canvas | Detailed Specification |
+|:---:|---|---|:---:|:---:|---|
+| **01** | **Executive Overview** | Headline operational KPIs, freshness label, currency warning | `COMPLETE` | `CANVAS BUILT` | [Page 01 Spec](powerbi/page-specs/01_executive_overview.md) |
+| **02** | **Sales Performance** | Monthly order pacing, MoM/YoY growth (distinguished from revenue) | `COMPLETE` | `AUTHORING PHASE` | [Page 02 Spec](powerbi/page-specs/02_sales_performance.md) |
+| **03** | **Product Analysis** | 15 validated products, category share %, units per order | `COMPLETE` | `AUTHORING PHASE` | [Page 03 Spec](powerbi/page-specs/03_product_analysis.md) |
+| **04** | **Transaction & Channel Insights** | Channel & payment behaviors (identity collision disclosed) | `COMPLETE` | `AUTHORING PHASE` | [Page 04 Spec](powerbi/page-specs/04_transaction_channel_insights.md) |
+| **05** | **Region Analysis** | 50 countries, 42 currencies, continent map + table fallback | `COMPLETE` | `AUTHORING PHASE` | [Page 05 Spec](powerbi/page-specs/05_region_analysis.md) |
+| **06** | **Order Details** | Transaction drill-through grid across all 19 fact columns with search | `COMPLETE` | `AUTHORING PHASE` | [Page 06 Spec](powerbi/page-specs/06_order_details.md) |
+| **07** | **Profitability Analysis** | Currency-gated revenue, cost, profit, and margin waterfall | `COMPLETE` | `AUTHORING PHASE` | [Page 07 Spec](powerbi/page-specs/07_profitability_analysis.md) |
+| **08** | **Order Exceptions** | Cancellations (150K) and status failures (returns excluded) | `COMPLETE` | `AUTHORING PHASE` | [Page 08 Spec](powerbi/page-specs/08_order_exceptions.md) |
+| **09** | **Trend Analysis & Forecast Roadmap** | 5-year moving average trend decomposition + ML roadmap | `COMPLETE` | `AUTHORING PHASE` | [Page 09 Spec](powerbi/page-specs/09_trend_forecast_roadmap.md) |
 
 ---
 
-## 9. Automated Testing & Verification Evidence
+## 10. Automated Testing & Verification Evidence
 
 An automated PowerShell test runner executes the complete SQL test suite in seconds:
 
@@ -235,7 +260,7 @@ ALL 12 TESTS PASSED SUCCESSFULLY!
 
 ---
 
-## 10. Quick Start & Reproduction Guide
+## 11. Quick Start & Reproduction Guide
 
 ### Prerequisites
 1. Microsoft SQL Server 2022 Developer Edition installed on localhost.
@@ -250,11 +275,16 @@ Download `world_business_data_3m.csv` (~1.3 GB) via Google Drive:
 Follow the comprehensive step-by-step walkthrough in [docs/SQL_SERVER_SETUP.md](docs/SQL_SERVER_SETUP.md) to create database `[3 _M]`, bulk insert the CSV, and run scripts `sql/00` through `sql/12`.
 
 ### Step 3: Open Power BI & Apply Design System
-Follow [docs/POWER_BI_SETUP.md](docs/POWER_BI_SETUP.md) to import `vw_FactSales`, apply [powerbi/theme/enterprise-light-theme.json](powerbi/theme/enterprise-light-theme.json), and bind the DAX measures from `powerbi/measures/`.
+Because the compiled VertiPaq `.pbix` is 214 MB (exceeding GitHub's 100 MB per-file tracking limit), binary `.pbix` files are excluded from Git commits via `.gitignore`. You can reproduce the exact data model in ~5 minutes by following [docs/POWER_BI_SETUP.md](docs/POWER_BI_SETUP.md):
+1. Connect Power BI Desktop to local SQL instance `.` database `[3 _M]`.
+2. Import `dbo.vw_FactSales`, `dbo.DimProduct`, `dbo.DimGeography`, and `dbo.DimDate`.
+3. Apply [powerbi/theme/enterprise-light-theme.json](powerbi/theme/enterprise-light-theme.json).
+4. Paste the DAX measures from `powerbi/measures/`.
+5. Follow [powerbi/page-specs/](powerbi/page-specs/) to layout visuals on the registered background canvas.
 
 ---
 
-## 11. Complete Technical Audit & Documentation Index
+## 12. Complete Technical Audit & Documentation Index
 
 ### Core Architecture & Modeling Documentation
 - [PRD Specification v1.0](docs/PRD.md)
@@ -283,7 +313,7 @@ Follow [docs/POWER_BI_SETUP.md](docs/POWER_BI_SETUP.md) to import `vw_FactSales`
 
 ---
 
-## 12. License, Attribution & Contact
+## 13. License, Attribution & Contact
 
 - **License:** Distributed under the [MIT License](LICENSE).
 - **Project Owner / Brand:** [Datta Sable](https://dattasable.com)  

@@ -2,8 +2,7 @@
 
 **Project:** Enterprise Global Business Analytics — 3M Synthetic Transactions  
 **Theme:** Premium Enterprise Corporate Light Theme  
-**Author:** Datta Sable (https://dattasable.com)  
-**Theme JSON:** [powerbi/theme/enterprise-light-theme.json](file:///d:/Datasets/3M%20Project%20Power%20BI/powerbi/theme/enterprise-light-theme.json)  
+**Theme JSON:** [`powerbi/theme/enterprise-light-theme.json`](../powerbi/theme/enterprise-light-theme.json)  
 **Source Data Download Link:** [Download 3M Source Data from Google Drive](https://drive.google.com/file/d/1qT-9U-xVM0GlPSyNEoaroIBIA8X05CmK/view?usp=sharing)  
 
 ---
