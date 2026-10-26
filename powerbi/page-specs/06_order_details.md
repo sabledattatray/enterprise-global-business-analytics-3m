@@ -13,13 +13,13 @@
 
 ## 1. Business Purpose & Acceptance Criteria
 
-**Purpose:** Provide operational auditors, supply chain coordinators, and financial reviewers with a drill-down grid to inspect specific transaction lines, fulfillment dates, and order statuses.
+**Purpose:** Provide operational auditors, supply chain coordinators, and financial reviewers with a drill-down grid to search, filter, and inspect specific transaction lines, fulfillment dates, and order statuses.
 
 **Acceptance Criteria:**
 - Primary grid visual is paginated, searchable, and sortable across all 19 reporting columns of `dbo.vw_FactSales`.
 - Handles NULL values correctly: `actual_delivery_date` displays as blank/hyphen for non-delivered orders without throwing errors.
 - Delivery lead time is calculated exclusively for delivered orders.
-- Does not expose un-sanitized synthetic personal data (emails, phone numbers).
+- Reconciles filtered card totals with individual grid lines.
 
 ---
 
@@ -27,6 +27,7 @@
 
 | Container ID | Visual Type | Title / Label | Data Fields / Measures | Formatting & Thresholds |
 |---|---|---|---|---|
+| `search-01`| Search Bar  | Order ID Search Filter | Text filter on `vw_FactSales[order_id]` | Instant substring search |
 | `kpi-01` | Card | Filtered Orders | `_Measures[Total Orders]` | Dynamic filtered count |
 | `kpi-02` | Card | Filtered Units | `_Measures[Total Units Sold]` | Dynamic filtered units |
 | `kpi-03` | Card | Delivery Completion | `_Measures[Delivery Completion Rate]` | Percentage |

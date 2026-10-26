@@ -1,0 +1,43 @@
+# PRD v1.1 — Enterprise Global Business Analytics 3M: Final Technical Audit
+
+## Objective
+Audit and strengthen the existing Enterprise Global Business Analytics — 3M project without rebuilding or replacing validated components.
+
+## Mandatory Tasks
+
+1. Audit the 13 SQL scripts for idempotency, transaction safety, data integrity, referential constraints, and reproducibility.
+2. Verify raw-to-clean reconciliation for all 3,000,000 transactions.
+3. Validate the fact-table grain, dimension keys, and Power BI relationships.
+4. Audit every financial DAX measure for cross-currency aggregation risks and invalid currency values.
+5. Preserve original transaction dates and document the approved 81-day reporting adjustment.
+6. Audit product surrogate key mapping and prevent duplicate or unmatched product mappings.
+7. Verify that customer identifier collisions cannot produce misleading customer-level KPIs.
+8. Review all nine dashboard specifications and replace unsupported analytical claims.
+9. Rename Customer Insights to Transaction & Channel Insights where appropriate.
+10. Rename Forecast Roadmap to Trend Analysis & Forecast Roadmap unless a validated forecasting model exists.
+11. Measure SQL query performance and Power BI refresh and model performance using reproducible test conditions.
+12. Validate the Power BI theme, 260 SVG assets, 11 mockups, and accessibility.
+13. Review GitHub documentation, sample data, licensing, dataset checksum, setup instructions, and security exclusions.
+14. Produce an evidence-backed audit report with findings, corrections, remaining limitations, and acceptance results.
+
+## Strict Implementation Rules
+- Do not delete or overwrite the original dataset.
+- Do not invent financial totals, conversion rates, benchmark results, or test evidence.
+- Do not claim PBIX validation unless the actual report has been inspected.
+- Do not mark unexecuted tests as passed.
+- Preserve the existing nine-page design identity.
+- Make changes incrementally and document each modification.
+- Obtain approval before destructive SQL schema changes.
+
+## Required Deliverables
+- TECHNICAL_AUDIT_REPORT.md
+- DATA_QUALITY_SCORECARD.md
+- SQL_RECONCILIATION_REPORT.md
+- POWERBI_MODEL_VALIDATION.md
+- DAX_CURRENCY_AUDIT.md
+- PERFORMANCE_BENCHMARK.md
+- KNOWN_LIMITATIONS.md
+- README_IMPROVEMENT_REPORT.md
+
+## Acceptance Criteria
+All critical issues must be resolved or explicitly documented as open. Every reported test result must have reproducible evidence. The project must remain consistent with the original synthetic data and its approved transformations.

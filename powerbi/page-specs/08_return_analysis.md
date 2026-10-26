@@ -18,7 +18,7 @@
 > [!CAUTION]
 > **DATA AVAILABILITY GATE & TRUTHFULNESS STANDARD:**  
 > The verified data model contains **order cancellations** (`order_status = 'Cancelled'`, exactly **150,324 rows**) and **payment failures** (`payment_status = 'Failed'`), but **does not contain physical return shipment scans or cash refund transaction ledgers.**  
-> - In strict compliance with PRD Section 8.8, this page is accurately titled **"Order Exceptions & Cancellations"**.  
+> - In strict compliance with PRD Section 8.8 and PRD v1.1, this page is accurately titled **"Order Exceptions & Cancellations"**.  
 > - **Cancelled orders are NOT relabeled as returns**, and **no fabricated return reasons or refund dollar totals are displayed.**
 
 ---
@@ -31,10 +31,11 @@
 | `kpi-02` | Card | Cancellation Rate | `_Measures[Cancellation Rate]` | Baseline: 5.01% (Target < 6.0%) |
 | `kpi-03` | Card | Delivered Orders | `_Measures[Delivered Orders]` | Baseline: 1,950,380 orders |
 | `kpi-04` | Card | Completion Rate | `_Measures[Delivery Completion Rate]` | Baseline: 65.01% |
-| `chart-01`| Line Chart | Cancellation Rate Trend by Month | X: `DimDate[YearMonth]`, Y: `[Cancellation Rate]` | Highlight monthly spikes with threshold line at 5% |
-| `chart-02`| Bar Chart | Cancellations by Product Category | Y: `DimProduct[product_category]`, X: `[Cancelled Orders]` | Sorted descending |
-| `chart-03`| Bar Chart | Cancellation Rate by Channel | Y: `vw_FactSales[sales_channel]`, X: `[Cancellation Rate]` | Compare channel failure rates |
+| `chart-01`| Line Chart | Cancellation Rate Trend by Month | X: `DimDate[YearMonth]`, Y: `[Cancellation Rate]` | Highlights monthly spikes with 5% target reference line |
+| `chart-02`| Bar Chart | Cancellation Rate by Continent / Region | Y: `DimGeography[continent]`, X: `[Cancellation Rate]` | Regional outlier detection |
+| `chart-03`| Bar Chart | Cancellation Rate by Sales Channel | Y: `vw_FactSales[sales_channel]`, X: `[Cancellation Rate]` | Channel comparison |
 | `chart-04`| Table Visual | Product Exception Breakdown | Columns: `DimProduct[product_name]`, `[Total Orders]`, `[Cancelled Orders]`, `[Cancellation Rate]`, `[Delivery Completion Rate]` | Data bars on Cancellation Rate |
 | `slicer-01`| Slicer | Product Category | `DimProduct[product_category]` | Dropdown |
 | `slicer-02`| Slicer | Sales Channel | `vw_FactSales[sales_channel]` | Dropdown |
-| `slicer-03`| Slicer | Country | `DimGeography[country]` | Dropdown |
+| `slicer-03`| Slicer | Region / Continent | `DimGeography[continent]` | Dropdown |
+| `slicer-04`| Slicer | Year / Period | `DimDate[Year]` | Tile buttons |

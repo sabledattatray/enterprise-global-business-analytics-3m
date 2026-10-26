@@ -16,10 +16,10 @@
 **Purpose:** Analyze order pacing, volume momentum, sales channel effectiveness, and customer payment methods over time across the 3-million-transaction portfolio.
 
 **Acceptance Criteria:**
+- **Explicit Metric Separation:** Visuals and titles clearly distinguish **Order Volume Growth** (commercial transactions) from **Monetary Sales Growth** (currency-gated local revenues).
 - Chronological time series sorts correctly using `DimDate[YearMonthSort]`.
 - Period-over-period comparisons (`Orders MoM % Change`, `Orders YoY % Change`) calculate properly with no division-by-zero errors.
 - Payment status breakdown reconciles with confirmed source distributions (Paid, Pending, Failed).
-- Revenue charts require a single currency filter; multi-currency context displays operational volumes instead of invalid cross-currency sums.
 
 ---
 
@@ -29,19 +29,12 @@
 |---|---|---|---|---|
 | `kpi-01` | Card | Total Orders | `_Measures[Total Orders]` | Format: `#,##0` |
 | `kpi-02` | Card | Total Units Sold | `_Measures[Total Units Sold]` | Format: `#,##0` |
-| `kpi-03` | Card | MoM Growth Rate | `_Measures[Orders MoM % Change]` | Color: Green (`#16A36A`) if >0, Red (`#D94B5C`) if <0 |
-| `kpi-04` | Card | YoY Growth Rate | `_Measures[Orders YoY % Change]` | Dynamic variance indicator |
+| `kpi-03` | Card | Order MoM Growth Rate | `_Measures[Orders MoM % Change]` | Color: Green (`#16A36A`) if >0, Red (`#D94B5C`) if <0 |
+| `kpi-04` | Card | Order YoY Growth Rate | `_Measures[Orders YoY % Change]` | Dynamic variance indicator |
 | `chart-01`| Line & Clustered Column | Order Volume & Period Growth | X: `DimDate[YearMonth]`, Col: `[Total Orders]`, Line: `[Orders MoM % Change]` | Double Y-axis, Column: `#1769E0`, Line: `#E18A24` |
-| `chart-02`| Clustered Bar | Performance by Sales Channel | Y: `vw_FactSales[sales_channel]`, X: `[Total Orders]`, Tooltip: `[Total Units Sold]` | Sorted descending by orders |
+| `chart-02`| Clustered Bar | Volume by Sales Channel | Y: `vw_FactSales[sales_channel]`, X: `[Total Orders]`, Tooltip: `[Total Units Sold]` | Sorted descending by orders |
 | `chart-03`| Treemap | Volume by Payment Status | Category: `vw_FactSales[payment_status]`, Values: `[Total Orders]` | Distinct theme colors |
 | `chart-04`| Matrix Table | Channel & Category Cross-Matrix | Rows: `vw_FactSales[sales_channel]`, Cols: `DimProduct[product_category]`, Values: `[Total Orders]` | Heatmap conditional formatting on cells |
 | `slicer-01`| Slicer | Year | `DimDate[Year]` | Tile slicer (2021, 2022, 2023, 2024, 2025, 2026) |
 | `slicer-02`| Slicer | Sales Channel | `vw_FactSales[sales_channel]` | Dropdown |
 | `slicer-03`| Slicer | Payment Status | `vw_FactSales[payment_status]` | Dropdown |
-
----
-
-## 3. Data Integrity & Currency Rules
-
-- Cross-currency aggregations of `revenue` are blocked from this page unless a single currency slicer is added.
-- The default view focuses on commercial activity units (Orders and Physical Units Sold) which are mathematically valid across all 50 countries.

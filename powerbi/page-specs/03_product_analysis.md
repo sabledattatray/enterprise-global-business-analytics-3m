@@ -13,27 +13,12 @@
 
 ## 1. Business Purpose & Acceptance Criteria
 
-**Purpose:** Provide deep-dive catalog analytics across the 15 validated enterprise products, evaluating category velocity, brand volume, and fulfillment performance.
+**Purpose:** Provide deep-dive catalog analytics across the 15 validated enterprise products, evaluating category velocity, brand volume, basket density, and fulfillment performance.
 
 **Acceptance Criteria:**
-- Exposes exactly the **15 validated product entities** from `dbo.DimProduct`:
-  1. Fitness Tracker (ActiveLife)
-  2. Headphones (SoundWave)
-  3. Business Book (KnowledgePress)
-  4. Smartphone (MobileSphere)
-  5. T-Shirt (StyleCraft)
-  6. Printer (OfficePro)
-  7. Backpack (TravelMate)
-  8. Snack Box (FreshChoice)
-  9. Monitor (ViewMax)
-  10. Desk (UrbanLiving)
-  11. Laptop (TechNova)
-  12. Jacket (UrbanWear)
-  13. Skin Care Kit (PureGlow)
-  14. Coffee Pack (DailyHarvest)
-  15. Office Chair (ComfortWorks)
-- **Zero reliance on source `product_id`**, which suffered from synthetic cross-product identity collisions.
-- All product slicers and visual legends use `DimProduct[product_name]` and `DimProduct[brand]`.
+- Exposes exactly the **15 validated product entities** from `dbo.DimProduct`.
+- **Zero reliance on source `product_id`**, which suffered from cross-product mapping collisions.
+- Includes **Category Volume Share (%)** and **Average Units Per Order** for each product entity.
 
 ---
 
@@ -46,9 +31,9 @@
 | `kpi-03` | Card | Total Units Sold | `_Measures[Total Units Sold]` | Format: `#,##0` |
 | `kpi-04` | Card | Average Units / Order | `_Measures[Average Units Per Order]` | Format: `#,##0.00` |
 | `chart-01`| Bar Chart | Product Volume Leaderboard | Y: `DimProduct[product_name]`, X: `[Total Orders]`, Data Labels: On | Bar color: `#1769E0` |
-| `chart-02`| Donut Chart| Orders by Product Category | Legend: `DimProduct[product_category]`, Values: `[Total Orders]` | Category color palette |
+| `chart-02`| Donut Chart| Category Share (% of Orders) | Legend: `DimProduct[product_category]`, Values: `[Total Orders]` | Percentage share labels |
 | `chart-03`| 100% Stacked Bar | Order Status by Product | Y: `DimProduct[product_name]`, X: `[Total Orders]`, Legend: `order_status` | Highlights cancellation outliers |
-| `chart-04`| Table Visual | Product Master Detail | Columns: `DimProduct[product_name]`, `brand`, `product_category`, `[Total Orders]`, `[Total Units Sold]`, `[Delivery Completion Rate]`, `[Cancellation Rate]` | Auto-sort by Total Orders |
+| `chart-04`| Table Visual | Product Master Detail | Columns: `DimProduct[product_name]`, `brand`, `product_category`, `[Total Orders]`, `[Total Units Sold]`, `[Average Units Per Order]`, `[Delivery Completion Rate]`, `[Cancellation Rate]` | Auto-sort by Total Orders |
 | `slicer-01`| Slicer | Product Category | `DimProduct[product_category]` | Dropdown |
 | `slicer-02`| Slicer | Brand | `DimProduct[brand]` | Dropdown |
 | `slicer-03`| Slicer | Country | `DimGeography[country]` | Dropdown |

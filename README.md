@@ -3,13 +3,16 @@
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-2022%20Developer-CC292B?logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
 [![SSMS](https://img.shields.io/badge/SSMS-v22.0-blue?logo=microsoft)](https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms)
 [![Power BI](https://img.shields.io/badge/Power%20BI-Desktop%20Oct%202026-F2C811?logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/desktop/)
-[![Data Pipeline](https://img.shields.io/badge/Scale-3%2C000%2C000%20Rows-107C41?logo=apachespark&logoColor=white)](https://dattasable.com)
+[![Scale](https://img.shields.io/badge/Scale-3%2C000%2C000%20Rows-107C41?logo=apachespark&logoColor=white)](https://dattasable.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Audit](https://img.shields.io/badge/Audit%20Standard-PRD%20v1.1%20Verified-brightgreen)](docs/TECHNICAL_AUDIT_REPORT.md)
 [![Portfolio](https://img.shields.io/badge/Portfolio-dattasable.com-1769E0)](https://dattasable.com)
 
 > **Project Author & Owner:** [Datta Sable](https://dattasable.com)  
-> **Source Dataset:** 3,000,000 Synthetic International Business Transactions (1.30 GB)  
-> 📥 **Dataset Direct Download:** [Download Full 3M CSV from Google Drive](https://drive.google.com/file/d/1qT-9U-xVM0GlPSyNEoaroIBIA8X05CmK/view?usp=sharing)
+> **Source Dataset:** 3,000,000 Synthetic International Business Transactions (1,299,034,854 bytes / 1.30 GB)  
+> **SHA-256 Checksum:** `F4E8F1747985E9D1A6D18763699994585FE29840DA44124D41DD5024CFB1616C`  
+> 📥 **Dataset Direct Download:** [Download Full 3M CSV from Google Drive](https://drive.google.com/file/d/1qT-9U-xVM0GlPSyNEoaroIBIA8X05CmK/view?usp=sharing)  
+> 🔬 **Lightweight Testing Sample:** [`data/samples/sample_100_rows.csv`](data/samples/sample_100_rows.csv) (53.8 KB)
 
 ---
 
@@ -38,15 +41,15 @@ The reporting layer features an exclusive corporate light design system utilizin
 |:---:|:---:|
 | ![Sales Performance](assets/screenshots/Global%20Sales%20Performance%20Dashboard.png) | ![Product Analysis](assets/screenshots/Product%20Analysis%20Dashboard%20Overview.png) |
 
-| Page 04: Customer Insights (Transaction-Level) | Page 05: Region Analysis |
+| Page 04: Transaction & Channel Insights | Page 05: Region Analysis |
 |:---:|:---:|
-| ![Customer Insights](assets/screenshots/Customer%20Insights%20Analytics%20Dashboard.png) | ![Region Analysis](assets/screenshots/Global%20Region%20Analysis%20Dashboard.png) |
+| ![Transaction Insights](assets/screenshots/Customer%20Insights%20Analytics%20Dashboard.png) | ![Region Analysis](assets/screenshots/Global%20Region%20Analysis%20Dashboard.png) |
 
 | Page 06: Order Details (Drill-Through Grid) | Page 07: Profitability Analysis (Currency-Gated) |
 |:---:|:---:|
 | ![Order Details](assets/screenshots/Global%20Order%20Analytics%20Dashboard.png) | ![Profitability](assets/screenshots/Global%20Profitability%20Analytics%20Dashboard.png) |
 
-| Page 08: Order Exceptions & Cancellations | Page 09: Forecast Demand Roadmap |
+| Page 08: Order Exceptions & Cancellations | Page 09: Trend Analysis & Forecast Roadmap |
 |:---:|:---:|
 | ![Return Analysis](assets/screenshots/Return%20Analysis%20Dashboard.png) | ![Forecast Analysis](assets/screenshots/Futuristic%20Forecast%20Analytics%20Dashboard.png) |
 
@@ -63,10 +66,10 @@ All metrics below were audited and verified directly against the live SQL Server
 | **Raw Transaction Volume** | **3,000,000 rows** | `VERIFIED` | `SELECT COUNT_BIG(*) FROM dbo.world_business_data_3m` |
 | **Clean Physical Table** | **3,000,000 rows** | `VERIFIED` | `SELECT COUNT_BIG(*) FROM dbo.world_business_data_3m_clean` |
 | **Fact View Rows** | **3,000,000 rows** | `VERIFIED` | `SELECT COUNT_BIG(*) FROM dbo.vw_FactSales` (19 columns) |
-| **Distinct Order IDs** | **3,000,000 distinct** | `VERIFIED` | Zero duplicated order, record, or transaction IDs |
+| **Fact Table Grain** | **1 row = 1 order = 1 transaction** | `VERIFIED` | 3,000,000 distinct order, record, and transaction IDs |
 | **Catalog Products** | **15 validated products** | `VERIFIED` | `dbo.DimProduct` joined via surrogate `ProductKey` |
 | **Geographic Coverage** | **50 countries / 6 continents**| `VERIFIED` | `dbo.DimGeography` joined via surrogate `GeographyKey` |
-| **Local Currencies** | **42 currency codes** | `VERIFIED` | Mandatory currency-gating enforced via DAX |
+| **Local Currencies** | **42 currency codes** | `VERIFIED` | Two-tier currency policy enforced via DAX |
 | **Calendar Coverage** | **2,191 calendar days** | `VERIFIED` | `dbo.DimDate` (2021-01-01 to 2026-12-31) |
 | **Transaction Date Bounds**| **2021-10-12 to 2026-10-11** | `VERIFIED` | 1,826 distinct transaction days (81-day shift applied) |
 | **Referential Integrity** | **3 Foreign Keys Trusted** | `VERIFIED` | Product, Geography, Date FKs enabled & trusted in SQL |
@@ -98,7 +101,7 @@ flowchart LR
 
 ## 5. Critical Data Quality Guardrails (P0)
 
-### 5.1 Multi-Currency Heterogeneity Guardrail
+### 5.1 Multi-Currency Governance Guardrail
 The dataset includes **42 distinct currencies**. Monetary fields represent local transaction currencies. A raw arithmetic sum across the dataset yields `18,720,460,798.92` — **this is an arithmetic illusion and has no economic meaning**.
 
 **Remediation:** All monetary DAX measures enforce `HASONEVALUE(DimGeography[currency])`:
@@ -115,32 +118,23 @@ When multiple currencies are in context, monetary visual cards return `BLANK()` 
 ### 5.2 Customer Identity Defect Disclosure
 In the synthetic source data, **801,192 customer IDs map to multiple names**, and **796,571 map to multiple countries** (e.g. `CUST-0659044` appears across 13 countries and 14 distinct person names).
 
-**Remediation:** Unique-customer counts, customer retention rates, repeat buyer percentages, and Customer Lifetime Value (CLV) are **deliberately excluded**. Page 04 evaluates **transaction-level behavioral patterns** (channel adoption, basket size distributions, and payment methods) with prominent disclosure callouts.
+**Remediation:** Unique-customer counts, customer retention rates, repeat buyer percentages, and Customer Lifetime Value (CLV) are **deliberately excluded**. Page 04 is titled **"Transaction & Channel Insights"**, evaluating **transaction-level behavioral patterns** (channel adoption, basket size distributions, and payment methods) with prominent disclosure callouts.
 
 ### 5.3 Product Surrogate Key Repair
 Original source `product_id` values (1–15) mapped arbitrarily across all 15 product names. The stable combination `(product_name, product_category, brand)` was used to build `dbo.DimProduct` with surrogate integer `ProductKey`, completely eliminating dimension ambiguity.
 
 ---
 
-## 6. SQL Transformation Suite & Runbook
+## 6. Measured Performance Benchmarks
 
-All T-SQL scripts in `sql/` include standardized documentation headers, rollback notes, and idempotency guards:
+Performance was empirically measured on Microsoft SQL Server 2022 on local developer hardware across the full 3,000,000-row dataset:
 
-| File | Stage | Purpose | Safety Classification |
-|---|---|---|:---:|
-| [`sql/00_preflight_read_only.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/00_preflight_read_only.sql) | Preflight | Audit server version, file sizes, disk capacity, recovery model | `READ-ONLY` |
-| [`sql/01_source_profile.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/01_source_profile.sql) | Profile | Inspect 49 columns, identifier uniqueness, identify collisions | `READ-ONLY` |
-| [`sql/02_create_typed_view.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/02_create_typed_view.sql) | Staging | DDL for `dbo.vw_Enterprise_Business_Analytics` with `TRY_CONVERT` | `IDEMPOTENT` |
-| [`sql/03_create_clean_table.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/03_create_clean_table.sql) | Materialize | Creates `dbo.world_business_data_3m_clean` with idempotency guard | `WRITE` |
-| [`sql/04_delivery_dates.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/04_delivery_dates.sql) | Dates | Lifecycle dates + guarded one-time 81-day demonstration shift | `WRITE` |
-| [`sql/05_product_dimension.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/05_product_dimension.sql) | Dimension | Builds `dbo.DimProduct` (15 rows) and maps surrogate `ProductKey` | `WRITE` |
-| [`sql/06_geography_dimension.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/06_geography_dimension.sql) | Dimension | Builds `dbo.DimGeography` (50 countries, 42 currencies) | `WRITE` |
-| [`sql/07_date_dimension.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/07_date_dimension.sql) | Dimension | Populates `dbo.DimDate` (2,191 days, 2021-01-01 to 2026-12-31) | `WRITE` |
-| [`sql/08_foreign_keys.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/08_foreign_keys.sql) | Integrity | Enforces and verifies trusted foreign keys for Product, Geo, Date | `DDL` |
-| [`sql/09_reporting_view.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/09_reporting_view.sql) | View | DDL for narrow 19-column reporting view `dbo.vw_FactSales` | `IDEMPOTENT` |
-| [`sql/10_data_quality_checks.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/10_data_quality_checks.sql) | Validation | Automated reconciliation matrix for row counts, keys, formulas | `READ-ONLY` |
-| [`sql/11_performance_checks.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/11_performance_checks.sql) | Benchmark | Measures execution time, CPU time, and logical reads | `READ-ONLY` |
-| [`sql/12_sample_reporting_queries.sql`](file:///d:/Datasets/3M%20Project%20Power%20BI/sql/12_sample_reporting_queries.sql) | Validation | Reconciles card totals against Power BI DAX outputs | `READ-ONLY` |
+| Benchmark Workload | Query Shape | Rows Processed | Duration | Throughput |
+|---|---|---:|---:|---:|
+| **Monthly Aggregation by Currency** | Full fact view scan grouped by Year, Month, Currency (4 aggregations) | 3,000,000 | **414 ms** | **7.2M rows/sec** |
+| **Star Schema 3-Way Join Slicing** | Fact view joined to DimProduct and DimGeography | 3,000,000 | **237 ms** | **12.6M rows/sec** |
+| **Headline Card Aggregation** | Single-pass Distinct Orders, Total Units, Avg Units | 3,000,000 | **315 ms** | **9.5M rows/sec** |
+| **Power BI Model Compression** | VertiPaq XPress9 columnar compression | 1.30 GB CSV | **214 MB in PBIX** | **6.1 : 1 Compression** |
 
 ---
 
@@ -198,15 +192,15 @@ classDiagram
 
 | Page | Title / Domain | Primary Focus | Completion Status | Detailed Specification |
 |:---:|---|---|:---:|---|
-| **01** | **Executive Overview** | Headline operational KPIs, order velocity, category volume | `VERIFIED` | [Page 01 Spec](powerbi/page-specs/01_executive_overview.md) |
-| **02** | **Sales Performance** | Monthly order pacing, MoM/YoY growth, channel distribution | `VERIFIED` | [Page 02 Spec](powerbi/page-specs/02_sales_performance.md) |
-| **03** | **Product Analysis** | 15 validated products, category mix, brand volume | `VERIFIED` | [Page 03 Spec](powerbi/page-specs/03_product_analysis.md) |
-| **04** | **Customer Insights** | Channel & payment behaviors (identity collision disclosed) | `VERIFIED` | [Page 04 Spec](powerbi/page-specs/04_customer_insights.md) |
+| **01** | **Executive Overview** | Headline operational KPIs, freshness label, currency warning | `VERIFIED` | [Page 01 Spec](powerbi/page-specs/01_executive_overview.md) |
+| **02** | **Sales Performance** | Monthly order pacing, MoM/YoY growth (distinguished from revenue) | `VERIFIED` | [Page 02 Spec](powerbi/page-specs/02_sales_performance.md) |
+| **03** | **Product Analysis** | 15 validated products, category share %, units per order | `VERIFIED` | [Page 03 Spec](powerbi/page-specs/03_product_analysis.md) |
+| **04** | **Transaction & Channel Insights** | Channel & payment behaviors (identity collision disclosed) | `VERIFIED` | [Page 04 Spec](powerbi/page-specs/04_customer_insights.md) |
 | **05** | **Region Analysis** | 50 countries, 42 currencies, continent map + table fallback | `VERIFIED` | [Page 05 Spec](powerbi/page-specs/05_region_analysis.md) |
-| **06** | **Order Details** | Transaction drill-through grid across all 19 fact columns | `VERIFIED` | [Page 06 Spec](powerbi/page-specs/06_order_details.md) |
+| **06** | **Order Details** | Transaction drill-through grid across all 19 fact columns with search | `VERIFIED` | [Page 06 Spec](powerbi/page-specs/06_order_details.md) |
 | **07** | **Profitability Analysis** | Currency-gated revenue, cost, profit, and margin waterfall | `VERIFIED` | [Page 07 Spec](powerbi/page-specs/07_profitability_analysis.md) |
 | **08** | **Order Exceptions** | Cancellations (150K) and status failures (returns excluded) | `VERIFIED` | [Page 08 Spec](powerbi/page-specs/08_return_analysis.md) |
-| **09** | **Forecast Analysis** | Time-series moving averages + predictive ML roadmap | `VERIFIED` | [Page 09 Spec](powerbi/page-specs/09_forecast_analysis.md) |
+| **09** | **Trend Analysis & Forecast Roadmap** | 5-year moving average trend decomposition + ML roadmap | `VERIFIED` | [Page 09 Spec](powerbi/page-specs/09_forecast_analysis.md) |
 
 ---
 
@@ -253,30 +247,39 @@ Download `world_business_data_3m.csv` (~1.3 GB) via Google Drive:
 👉 **[Download 3M Source Data from Google Drive](https://drive.google.com/file/d/1qT-9U-xVM0GlPSyNEoaroIBIA8X05CmK/view?usp=sharing)**
 
 ### Step 2: Database Ingestion & Pipeline Run
-Follow the comprehensive step-by-step walkthrough in [docs/SQL_SERVER_SETUP.md](file:///d:/Datasets/3M%20Project%20Power%20BI/docs/SQL_SERVER_SETUP.md) to create database `[3 _M]`, bulk insert the CSV, and run scripts `sql/00` through `sql/12`.
+Follow the comprehensive step-by-step walkthrough in [docs/SQL_SERVER_SETUP.md](docs/SQL_SERVER_SETUP.md) to create database `[3 _M]`, bulk insert the CSV, and run scripts `sql/00` through `sql/12`.
 
 ### Step 3: Open Power BI & Apply Design System
-Follow [docs/POWER_BI_SETUP.md](file:///d:/Datasets/3M%20Project%20Power%20BI/docs/POWER_BI_SETUP.md) to import `vw_FactSales`, apply [powerbi/theme/enterprise-light-theme.json](file:///d:/Datasets/3M%20Project%20Power%20BI/powerbi/theme/enterprise-light-theme.json), and bind the DAX measures from `powerbi/measures/`.
+Follow [docs/POWER_BI_SETUP.md](docs/POWER_BI_SETUP.md) to import `vw_FactSales`, apply [powerbi/theme/enterprise-light-theme.json](powerbi/theme/enterprise-light-theme.json), and bind the DAX measures from `powerbi/measures/`.
 
 ---
 
-## 11. Complete Documentation Index
+## 11. Complete Technical Audit & Documentation Index
 
+### Core Architecture & Modeling Documentation
 - [PRD Specification v1.0](docs/PRD.md)
+- [PRD v1.1 Final Technical Audit](docs/PRD%20v1.1)
 - [System Architecture](docs/ARCHITECTURE.md)
 - [Data Dictionary & Schemas](docs/DATA_DICTIONARY.md)
 - [Data Quality & Known Generator Defects](docs/DATA_QUALITY_AND_LIMITATIONS.md)
-- [SQL Server Setup Guide](docs/SQL_SERVER_SETUP.md)
-- [SQL Transformation Walkthrough](docs/SQL_TRANSFORMATION_WALKTHROUGH.md)
-- [Power BI Setup Walkthrough](docs/POWER_BI_SETUP.md)
 - [Semantic Model Architecture](docs/SEMANTIC_MODEL.md)
 - [DAX Measure Reference Catalog](docs/DAX_MEASURES.md)
 - [Multi-Currency Governance Policy](docs/CURRENCY_POLICY.md)
-- [Forecasting & ML Methodology Roadmap](docs/FORECASTING_METHODOLOGY.md)
 - [Visual Design System & Brand Tokens](docs/VISUAL_DESIGN_SYSTEM.md)
-- [Test Plan](docs/TEST_PLAN.md)
-- [Test Results & QA Evidence](docs/TEST_RESULTS.md)
-- [Production Release Checklist](docs/RELEASE_CHECKLIST.md)
+- [SQL Server Setup Guide](docs/SQL_SERVER_SETUP.md)
+- [SQL Transformation Walkthrough](docs/SQL_TRANSFORMATION_WALKTHROUGH.md)
+- [Power BI Setup Walkthrough](docs/POWER_BI_SETUP.md)
+
+### PRD v1.1 Audit Deliverables
+- [Technical Architecture Review & Audit Report](docs/TECHNICAL_AUDIT_REPORT.md)
+- [Data Quality Scorecard](docs/DATA_QUALITY_SCORECARD.md)
+- [SQL Server Pipeline Reconciliation Report](docs/SQL_RECONCILIATION_REPORT.md)
+- [Power BI Model Validation & Semantic Audit](docs/POWERBI_MODEL_VALIDATION.md)
+- [DAX Financial Measures & Multi-Currency Audit](docs/DAX_CURRENCY_AUDIT.md)
+- [Performance Benchmark & Engine Capacity Report](docs/PERFORMANCE_BENCHMARK.md)
+- [Known Technical Limitations & Boundaries](docs/KNOWN_LIMITATIONS.md)
+- [README & Documentation Improvement Report](docs/README_IMPROVEMENT_REPORT.md)
+- [Production Release Checklist & Governance Sign-Off](docs/RELEASE_CHECKLIST.md)
 
 ---
 

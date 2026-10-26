@@ -1,7 +1,8 @@
-# Page 04 — Customer Insights (Transaction-Level)
+# Page 04 — Transaction & Channel Insights
 
-**Title:** Global Business Analytics — Customer & Channel Behavioral Insights  
-**Route / Navigation ID:** `page-04-customer-insights`  
+**Title:** Global Business Analytics — Transaction & Channel Insights  
+**Former Title:** Customer Insights (Renamed per PRD v1.1 to avoid implying verified individual identities)  
+**Route / Navigation ID:** `page-04-transaction-channel-insights`  
 **Canvas Dimensions:** 1920 × 1080 px (16:9 widescreen)  
 **Layout Grid:** 18% Left Persistent Sidebar, 82% Main Dashboard Canvas  
 **Visual Theme:** `powerbi/theme/enterprise-light-theme.json`  

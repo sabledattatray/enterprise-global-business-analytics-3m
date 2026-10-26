@@ -17,9 +17,9 @@
 
 **Acceptance Criteria:**
 - Verifies all **50 countries** mapped via `dbo.DimGeography`.
-- Displays regional order volume and physical units sold without currency mixing.
-- Includes an **Accessible Table Fallback** alongside the geographic map to ensure full WCAG accessibility and prevent reliance on web geocoding services.
-- Monetary columns displayed at the country level must explicitly display the country's local currency symbol or code (`DimGeography[currency]`).
+- Displays regional order volume, physical units sold, and country-level currency indicators.
+- Includes an **Accessible Table Fallback** alongside the geographic map to ensure full WCAG accessibility.
+- Monetary values at the country level display the specific domestic currency code (`DimGeography[currency]`).
 
 ---
 
@@ -31,9 +31,9 @@
 | `kpi-02` | Card | Distinct Currencies | Distinct count of `DimGeography[currency]` | Target: 42 currencies |
 | `kpi-03` | Card | Total Orders | `_Measures[Total Orders]` | Format: `#,##0` |
 | `kpi-04` | Card | Total Units Sold | `_Measures[Total Units Sold]` | Format: `#,##0` |
-| `map-01`  | Map / Filled Map | Global Order Distribution | Location: `DimGeography[country]`, Bubble Size: `[Total Orders]`, Tooltip: `DimGeography[continent]`, `DimGeography[currency]` | Bubble color: `#2588F5` |
+| `map-01`  | Map / Filled Map | Global Order Distribution | Location: `DimGeography[country]`, Bubble Size: `[Total Orders]`, Tooltip: `DimGeography[continent]`, `DimGeography[currency]`, `[Total Units Sold]` | Bubble color: `#2588F5` |
 | `chart-01`| Bar Chart | Orders by Continent | Y: `DimGeography[continent]`, X: `[Total Orders]` | Data labels on |
-| `chart-02`| Bar Chart | Top 10 Countries by Orders | Y: `DimGeography[country]`, X: `[Total Orders]` | Top N filter = 10 |
+| `chart-02`| Bar Chart | Top 10 Countries by Orders & Units | Y: `DimGeography[country]`, X: `[Total Orders]`, Tooltip: `[Total Units Sold]` | Top N filter = 10 |
 | `table-01`| Table (Fallback) | Regional Master Ledger | Columns: `DimGeography[continent]`, `DimGeography[country]`, `DimGeography[currency]`, `[Total Orders]`, `[Total Units Sold]`, `[Average Units Per Order]` | Alternating row shading |
 | `slicer-01`| Slicer | Continent | `DimGeography[continent]` | Multi-select buttons |
 | `slicer-02`| Slicer | Currency Code | `DimGeography[currency]` | Dropdown |

@@ -18,9 +18,9 @@
 > [!IMPORTANT]
 > **CURRENCY GATE SPECIFICATION:**  
 > Because the dataset contains 42 local currencies, **all monetary visuals on this page require a single currency in the active filter context.**  
-> - When `DimGeography[currency]` has exactly 1 value (e.g., `USD`, `EUR`, `CHF`), visuals render full financial metrics.  
-> - When multiple currencies are selected (unfiltered global view), all financial cards return `BLANK()` and display the dynamic banner:  
->   `"⚠ Multi-currency context active (42 currencies). Select a single currency or country to view financial figures."`
+> - When `DimGeography[currency]` has exactly 1 value (e.g., `USD`, `EUR`, `CHF`), visuals render full financial metrics and display the **Active Currency Label**.  
+> - When multiple currencies are selected (unfiltered global view), all financial cards return `BLANK()` and enter an **Explicit Unavailable State**, displaying the dynamic banner:  
+>   `"⚠ Multi-currency context active (42 currencies). Financial metrics unavailable until a single currency or country is selected."`
 
 ---
 
@@ -28,7 +28,7 @@
 
 | Container ID | Visual Type | Title / Label | Data Fields / Measures | Formatting & Thresholds |
 |---|---|---|---|---|
-| `gate-01` | Dynamic Card | Active Currency Notice | `_Measures[Currency Guardrail Notice]` | Dynamic alert text |
+| `gate-01` | Dynamic Card | Active Currency & Status Label | `_Measures[Currency Guardrail Notice]` | Dynamic alert text / Currency badge |
 | `kpi-01` | Card | Net Revenue | `_Measures[Revenue (Single Currency Only)]` | Dynamic format with currency code |
 | `kpi-02` | Card | Total Cost | `_Measures[Cost (Single Currency Only)]` | Dynamic format with currency code |
 | `kpi-03` | Card | Net Profit | `_Measures[Profit (Single Currency Only)]` | Font color: `#16A36A` |
